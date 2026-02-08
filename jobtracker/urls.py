@@ -25,12 +25,14 @@ Including another URLconf
 #     path('login/', auth_views.LoginView.as_view(template_name='jobs/login.html'), name='login'),
 #     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 # ]
-from django.http import HttpResponse
-from django.urls import path
-
-def home(request):
-    return HttpResponse("Django is working")
+from django.contrib import admin
+from django.urls import path, include
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('', home),
+    path('', include('jobs.urls')),   # homepage → jobs app
+    path('admin/', admin.site.urls),
+
+    path('login/', auth_views.LoginView.as_view(template_name='jobs/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]
