@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from .models import Job
 from .forms import JobForm
 from django.contrib.auth.decorators import login_required
@@ -19,17 +19,21 @@ def job_list(request):
     return render(request, 'jobs/job_list.html', context)
 
 
+@login_required
 def add_job(request):
     form = JobForm(request.POST or None)
 
     if form.is_valid():
-        form.save()
+        job = form.save(commit=False)
+        job.user = request.user
+        job.save()
         return redirect('/')
 
     return render(request, 'jobs/add_job.html', {'form': form})
 
+@login_required
 def edit_job(request, id):
-    job = Job.objects.get(id=id)
+    job = get_object_or_404(Job, id=id, user=request.user)
     form = JobForm(request.POST or None, instance=job)
 
     if form.is_valid():
@@ -38,8 +42,9 @@ def edit_job(request, id):
 
     return render(request, 'jobs/add_job.html', {'form': form})
 
+@login_required
 def delete_job(request, id):
-    job = Job.objects.get(id=id)
+    job = get_object_or_404(Job, id=id, user=request.user)
     job.delete()
     return redirect('/')
 
