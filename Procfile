@@ -1,1 +1,1 @@
-web: gunicorn jobtracker.wsgi
+web: python manage.py migrate && gunicorn jobtracker.wsgi:application
