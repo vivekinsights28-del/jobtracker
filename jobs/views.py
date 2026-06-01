@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Job
 from .forms import JobForm
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 
 
 @login_required
@@ -47,4 +49,18 @@ def delete_job(request, id):
     job = get_object_or_404(Job, id=id, user=request.user)
     job.delete()
     return redirect('/')
+
+
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('/')
+
+    form = UserCreationForm(request.POST or None)
+
+    if form.is_valid():
+        user = form.save()
+        login(request, user)
+        return redirect('/')
+
+    return render(request, 'jobs/register.html', {'form': form})
 
